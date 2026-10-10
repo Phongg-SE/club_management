@@ -1,0 +1,24 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : Feb 21, 2025, 11:46:13 PM
+    Author     : pc
+*/
+
+.toast-container {
+    max-width: 350px; /* Giới hạn chiều rộng */
+}
+
+#toastMessage {
+    width: 100%; /* Đảm bảo toast không rộng hơn container */
+    min-height: 60px; /* Tăng chiều cao để nhìn đẹp hơn */
+    padding: 10px; /* Tạo không gian hợp lý */
+}
+
+#toastProgress {
+    width: 100%;
+    height: 4px; /* Độ cao của thanh tiến trình */
+    transition: width 3s linear;
+}
