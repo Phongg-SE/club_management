@@ -20,8 +20,6 @@ import model.entity.RegistrationEvent;
  */
 public class RegistrationDAO {
 
-    Connection con = DBContext.getJDBCConnection();
-
     public List<Club> getClubByUserIdToFilter(int userId) {
         List<Club> clubs = new ArrayList<>();
         String query = "SELECT DISTINCT c.club_id, c.name "
@@ -260,23 +258,24 @@ public class RegistrationDAO {
                 + "JOIN club c ON e.club_id = c.club_id "
                 + "WHERE r.registration_id = ?";
 
-        try (PreparedStatement stmt = con.prepareStatement(sql)) {
+        try (Connection con = DBContext.getJDBCConnection();
+             PreparedStatement stmt = con.prepareStatement(sql)) {
             stmt.setInt(1, registrationId);
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                RegistrationEvent registrationEvent = new RegistrationEvent();
-                registrationEvent.setRegistration_id(rs.getInt("registration_id"));
-                registrationEvent.setEvent_id(rs.getInt("event_id"));
-                registrationEvent.setEmail(rs.getString("email"));
-                registrationEvent.setEventName(rs.getString("event_name"));
-                registrationEvent.setClubName(rs.getString("club_name"));
-                registrationEvent.setFull_name(rs.getString("full_name"));
-                registrationEvent.setMobile(rs.getString("mobile"));
-                registrationEvent.setStatus(rs.getString("status"));
-                registrationEvent.setNote(rs.getString("note"));
-                registrationEvent.setEventStatus(rs.getString("eventstatus"));
-                return registrationEvent;
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    RegistrationEvent registrationEvent = new RegistrationEvent();
+                    registrationEvent.setRegistration_id(rs.getInt("registration_id"));
+                    registrationEvent.setEvent_id(rs.getInt("event_id"));
+                    registrationEvent.setEmail(rs.getString("email"));
+                    registrationEvent.setEventName(rs.getString("event_name"));
+                    registrationEvent.setClubName(rs.getString("club_name"));
+                    registrationEvent.setFull_name(rs.getString("full_name"));
+                    registrationEvent.setMobile(rs.getString("mobile"));
+                    registrationEvent.setStatus(rs.getString("status"));
+                    registrationEvent.setNote(rs.getString("note"));
+                    registrationEvent.setEventStatus(rs.getString("eventstatus"));
+                    return registrationEvent;
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -287,7 +286,8 @@ public class RegistrationDAO {
     public boolean updateRegistrationStatus(int registrationId, String newStatus, String reason) {
         String sql = "UPDATE registration SET status = ?, reason =? WHERE registration_id = ?";
 
-        try (PreparedStatement stmt = con.prepareStatement(sql)) {
+        try (Connection con = DBContext.getJDBCConnection();
+             PreparedStatement stmt = con.prepareStatement(sql)) {
 
             stmt.setString(1, newStatus);
             stmt.setString(2, reason);
@@ -298,23 +298,6 @@ public class RegistrationDAO {
             e.printStackTrace();
         }
         return false;
-    }
-
-    public static void main(String[] args) {
-        RegistrationDAO registrationDAO = new RegistrationDAO();
-        boolean result = registrationDAO.updateRegistrationStatus(1, "Confirmed", "User requested cancellation");
-        System.out.println(result ? "Update successful!" : "Update failed!");
-    }
-
-    private static void printResults(List<RegistrationEvent> registrations) {
-        if (registrations.isEmpty()) {
-            System.out.println("Không có dữ liệu.");
-        } else {
-            for (RegistrationEvent reg : registrations) {
-                System.out.println("ID: " + reg.getRegistration_id() + ", Event: " + reg.getEventName() + ", Club: " + reg.getClubName() + ", Name: " + reg.getFull_name() + ", Status: " + reg.getStatus());
-            }
-        }
-        System.out.println("------------------------------------------------");
     }
 
     public List<RegistrationEvent> getRegistrationByLeaderId(int leaderId, int page, int pageSize) {

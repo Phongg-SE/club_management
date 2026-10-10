@@ -47,7 +47,6 @@ public class Login extends HttpServlet {
             String accessToken = gg.getToken(code);
             Google acc = gg.getUserInfo(accessToken);
             UserService userService = new UserService();
-            System.out.println(acc);
             if (userService.checkEmailExist(acc.getEmail())) {
                 ServletContext context = session.getServletContext();
                 ArrayList<Integer> firstLoginUsers = (ArrayList<Integer>) context.getAttribute("firstLoginUsers");
@@ -85,7 +84,18 @@ public class Login extends HttpServlet {
         String emailOrUsername = request.getParameter("email");
         String password = request.getParameter("password");
 
+        String clientIp = request.getRemoteAddr();
+        String rateLimitKey = clientIp + "_" + (emailOrUsername != null ? emailOrUsername.trim() : "");
+        if (service.user.LoginRateLimiter.isBlocked(rateLimitKey)) {
+            int remaining = service.user.LoginRateLimiter.getRemainingMinutes(rateLimitKey);
+            request.setAttribute("msg", "Tài khoản tạm thời bị khóa do đăng nhập sai quá 5 lần. Vui lòng thử lại sau " + remaining + " phút.");
+            request.setAttribute("email", emailOrUsername);
+            request.getRequestDispatcher("/WEB-INF/view/guest/login.jsp").forward(request, response);
+            return;
+        }
+
         if (!userService.checkExist(emailOrUsername)) {
+            service.user.LoginRateLimiter.recordFailedAttempt(rateLimitKey);
             request.setAttribute("msg", "Account does not exist!");
             request.setAttribute("email", emailOrUsername);
             request.getRequestDispatcher("/WEB-INF/view/guest/login.jsp").forward(request, response);
@@ -103,11 +113,15 @@ public class Login extends HttpServlet {
             }
 
             if (user == null) {
+                service.user.LoginRateLimiter.recordFailedAttempt(rateLimitKey);
                 request.setAttribute("msg", "Email or Username invalid!");
                 request.setAttribute("email", emailOrUsername);
                 request.getRequestDispatcher("/WEB-INF/view/guest/login.jsp").forward(request, response);
                 return;
             }
+
+            // Login successful, clear rate limit counter
+            service.user.LoginRateLimiter.recordSuccess(rateLimitKey);
 
             HttpSession session = request.getSession();
             ServletContext context = session.getServletContext();

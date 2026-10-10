@@ -269,12 +269,4 @@ public class SettingDAO extends DBContext {
             Logger.getLogger(DBContext.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-    public static void main(String[] args) {
-        SettingDAO st = new SettingDAO();
-        List<Setting> list = st.findAll();
-        for (Setting setting : list) {
-            System.out.println(setting.toString());
-        }
-    }
 }

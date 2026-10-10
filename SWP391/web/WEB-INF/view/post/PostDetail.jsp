@@ -184,6 +184,49 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- Comments & Discussion Section -->
+                            <div class="col-md-12 mt-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <div class="card-title">💬 Thảo luận & Bình luận (${comments != null ? comments.size() : 0})</div>
+                                    </div>
+                                    <div class="card-body">
+                                        <!-- Add Comment Form -->
+                                        <form action="AddComment" method="POST" class="mb-4">
+                                            <input type="hidden" name="post_id" value="${post.postId}" />
+                                            <div class="form-group mb-2 p-0">
+                                                <textarea name="content" class="form-control" rows="3" placeholder="Viết bình luận hoặc ý kiến của bạn về bài viết này..." required></textarea>
+                                            </div>
+                                            <button type="submit" class="btn btn-primary btn-sm">Gửi bình luận</button>
+                                        </form>
+
+                                        <hr/>
+
+                                        <!-- Comments List -->
+                                        <div class="comments-list">
+                                            <c:if test="${empty comments}">
+                                                <p class="text-muted text-center py-3">Chưa có bình luận nào. Hãy là người đầu tiên bình luận!</p>
+                                            </c:if>
+                                            <c:forEach items="${comments}" var="c">
+                                                <div class="d-flex mb-3 p-3 bg-light rounded">
+                                                    <div class="flex-shrink-0">
+                                                        <img src="${c.authorAvatar != null ? c.authorAvatar : 'assets/images/user-default.png'}" 
+                                                             class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;" alt="${c.authorName}">
+                                                    </div>
+                                                    <div class="flex-grow-1 ms-3">
+                                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                                            <h6 class="fw-bold mb-0">${c.authorName}</h6>
+                                                            <small class="text-muted">${c.createdAt}</small>
+                                                        </div>
+                                                        <p class="mb-0 text-dark">${c.content}</p>
+                                                    </div>
+                                                </div>
+                                            </c:forEach>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

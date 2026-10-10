@@ -371,7 +371,100 @@
                                                 </div>
                                             </form>
                                         </div>
+                                    </div>
 
+                                    <!-- Event Feedback & Rating Section -->
+                                    <div class="card card-round shadow-sm mt-4">
+                                        <div class="card-header d-flex justify-content-between align-items-center bg-white">
+                                            <h4 class="card-title fw-bold mb-0">⭐ Đánh Giá Sự Kiện (${avgRating > 0 ? avgRating : 0} / 5)</h4>
+                                            <span class="badge bg-warning text-dark"><i class="fas fa-star me-1"></i>Điểm trung bình: ${avgRating}</span>
+                                        </div>
+                                        <div class="card-body">
+                                            <c:if test="${not empty sessionScope.feedbackMsg}">
+                                                <div class="alert alert-success">${sessionScope.feedbackMsg}</div>
+                                                <c:remove var="feedbackMsg" scope="session"/>
+                                            </c:if>
+                                            <c:if test="${not empty sessionScope.feedbackError}">
+                                                <div class="alert alert-danger">${sessionScope.feedbackError}</div>
+                                                <c:remove var="feedbackError" scope="session"/>
+                                            </c:if>
+
+                                            <!-- Feedback Form -->
+                                            <form action="SubmitFeedback" method="POST" class="mb-4 p-3 bg-light rounded">
+                                                <input type="hidden" name="event_id" value="${event.event_id}">
+                                                <input type="hidden" name="csrfToken" value="${csrfToken}">
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-bold">Chọn mức độ hài lòng:</label>
+                                                    <select name="rating" class="form-select form-select-sm" style="width: auto;" required>
+                                                        <option value="5">⭐⭐⭐⭐⭐ 5 sao - Rất tuyệt vời</option>
+                                                        <option value="4">⭐⭐⭐⭐ 4 sao - Tốt</option>
+                                                        <option value="3">⭐⭐⭐ 3 sao - Bình thường</option>
+                                                        <option value="2">⭐⭐ 2 sao - Cần cải thiện</option>
+                                                        <option value="1">⭐ 1 sao - Không hài lòng</option>
+                                                    </select>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-bold">Nhận xét góp ý:</label>
+                                                    <textarea name="comment" class="form-control" rows="3" placeholder="Chia sẻ cảm nhận của bạn về sự kiện này..."></textarea>
+                                                </div>
+                                                <button type="submit" class="btn btn-sm btn-primary">
+                                                    <i class="fas fa-paper-plane me-1"></i> Gửi Đánh Giá
+                                                </button>
+                                            </form>
+
+                                            <!-- Feedback List -->
+                                            <div class="feedback-list">
+                                                <c:if test="${empty feedbacks}">
+                                                    <p class="text-muted fst-italic">Chưa có đánh giá nào cho sự kiện này. Hãy là người đầu tiên chia sẻ cảm nhận!</p>
+                                                </c:if>
+                                                <c:forEach var="fb" items="${feedbacks}">
+                                                    <div class="d-flex align-items-start mb-3 pb-3 border-bottom">
+                                                        <img src="${fb.userAvatar != null ? fb.userAvatar : 'assets/img/profile.jpg'}" class="rounded-circle me-3" width="40" height="40" style="object-fit:cover;">
+                                                        <div class="flex-grow-1">
+                                                            <div class="d-flex justify-content-between">
+                                                                <h6 class="fw-bold mb-1">${fb.userName}</h6>
+                                                                <small class="text-muted">${fb.createdAt}</small>
+                                                            </div>
+                                                            <div class="text-warning mb-1">
+                                                                <c:forEach begin="1" end="${fb.rating}">★</c:forEach>
+                                                            </div>
+                                                            <p class="mb-0 text-secondary">${fb.comment}</p>
+                                                        </div>
+                                                    </div>
+                                                </c:forEach>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Comments & Discussion Section -->
+                                    <div class="card card-round shadow-sm mt-4">
+                                        <div class="card-header bg-white">
+                                            <h4 class="card-title fw-bold mb-0">💬 Thảo Luận & Bình Luận</h4>
+                                        </div>
+                                        <div class="card-body">
+                                            <form action="AddComment" method="POST" class="mb-4">
+                                                <input type="hidden" name="event_id" value="${event.event_id}">
+                                                <input type="hidden" name="csrfToken" value="${csrfToken}">
+                                                <div class="input-group">
+                                                    <textarea name="content" class="form-control" rows="2" placeholder="Viết bình luận hoặc câu hỏi..." required></textarea>
+                                                    <button class="btn btn-primary" type="submit"><i class="fas fa-paper-plane"></i> Gửi</button>
+                                                </div>
+                                            </form>
+                                            <div class="comments-list">
+                                                <c:if test="${empty comments}">
+                                                    <p class="text-muted fst-italic">Chưa có bình luận nào.</p>
+                                                </c:if>
+                                                <c:forEach items="${comments}" var="c">
+                                                    <div class="d-flex align-items-start mb-3 pb-2 border-bottom">
+                                                        <img src="${c.authorAvatar != null ? c.authorAvatar : 'assets/img/profile.jpg'}" class="rounded-circle me-3" width="36" height="36" style="object-fit:cover;">
+                                                        <div>
+                                                            <h6 class="fw-bold mb-0">${c.authorName} <small class="text-muted fw-normal">${c.createdAt}</small></h6>
+                                                            <p class="mb-0 text-dark">${c.content}</p>
+                                                        </div>
+                                                    </div>
+                                                </c:forEach>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

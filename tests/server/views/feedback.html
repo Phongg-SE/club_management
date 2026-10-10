@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Event Feedback & Rating - SWP391</title>
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #0f172a;
+      --border: #e2e8f0;
+      --star-active: #fbbf24;
+      --star-inactive: #d1d5db;
+      --danger: #ef4444;
+      --success: #10b981;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+    body { background: var(--bg); color: var(--text); padding: 2rem; }
+    .container { max-width: 650px; margin: 0 auto; background: var(--card-bg); border-radius: 0.75rem; border: 1px solid var(--border); padding: 2rem; }
+    .stars { display: flex; gap: 0.5rem; font-size: 2rem; margin: 1rem 0; cursor: pointer; }
+    .star { color: var(--star-inactive); transition: color 0.2s; }
+    .star.active { color: var(--star-active); }
+    textarea { width: 100%; border: 1px solid var(--border); border-radius: 0.5rem; padding: 0.75rem; font-size: 0.95rem; min-height: 100px; margin-bottom: 1rem; }
+    .btn { padding: 0.6rem 1.2rem; background: var(--primary); color: white; border: none; border-radius: 0.375rem; font-weight: 600; cursor: pointer; }
+    .alert { padding: 0.75rem 1rem; border-radius: 0.375rem; margin-bottom: 1rem; display: none; }
+    .alert-danger { background: #fee2e2; color: #991b1b; }
+    .alert-success { background: #dcfce7; color: #166534; }
+    .stats-card { background: #f8fafc; border: 1px solid var(--border); border-radius: 0.5rem; padding: 1rem; margin-top: 1.5rem; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="/" style="color: var(--primary); text-decoration: none;">← Quay lại</a>
+    <h2 style="margin-top: 0.75rem; margin-bottom: 0.5rem;">⭐ Khảo Sát & Đánh Giá Sự Kiện</h2>
+    <p style="color: #64748b; font-size: 0.95rem; margin-bottom: 1.5rem;">Sự kiện: <strong>Workshop Lập Trình Java & Kỹ Năng Làm Dự Án</strong></p>
+
+    <div id="alertMsg" class="alert"></div>
+
+    <form id="feedbackForm" onsubmit="submitFeedback(event)">
+      <label style="font-weight: 600; font-size: 0.95rem;">Mức độ hài lòng của bạn:</label>
+      <div class="stars" id="starContainer">
+        <span class="star active" data-rating="1" onclick="setRating(1)">★</span>
+        <span class="star active" data-rating="2" onclick="setRating(2)">★</span>
+        <span class="star active" data-rating="3" onclick="setRating(3)">★</span>
+        <span class="star active" data-rating="4" onclick="setRating(4)">★</span>
+        <span class="star active" data-rating="5" onclick="setRating(5)">★</span>
+      </div>
+      <input type="hidden" id="ratingInput" value="5">
+
+      <label style="font-weight: 600; font-size: 0.95rem; display: block; margin-bottom: 0.5rem;">Ý kiến đóng góp / Cảm nhận:</label>
+      <textarea id="feedbackComment" placeholder="Chia sẻ trải nghiệm của bạn về khâu tổ chức, diễn giả hoặc nội dung..."></textarea>
+
+      <button type="submit" id="btnSubmitFeedback" class="btn">Gửi đánh giá</button>
+    </form>
+
+    <div class="stats-card">
+      <h4 style="margin-bottom: 0.5rem;">Thống Kê Hiện Tại Của Sự Kiện:</h4>
+      <div>Điểm trung bình: <strong id="avgScore">4.5</strong> / 5 ⭐ (<span id="totalReviews">2</span> lượt đánh giá)</div>
+    </div>
+  </div>
+
+  <script>
+    let currentRating = 5;
+
+    function setRating(val) {
+      currentRating = val;
+      document.getElementById('ratingInput').value = val;
+      document.querySelectorAll('.star').forEach(s => {
+        const starVal = parseInt(s.getAttribute('data-rating'), 10);
+        if (starVal <= val) {
+          s.classList.add('active');
+        } else {
+          s.classList.remove('active');
+        }
+      });
+    }
+
+    async function submitFeedback(e) {
+      e.preventDefault();
+      const alertEl = document.getElementById('alertMsg');
+      alertEl.style.display = 'none';
+
+      const comment = document.getElementById('feedbackComment').value.trim();
+
+      const res = await fetch('/api/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          event_id: 101,
+          user_id: 99, // Current test user
+          rating: currentRating,
+          comment
+        })
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        alertEl.className = 'alert alert-danger';
+        alertEl.textContent = data.error;
+        alertEl.style.display = 'block';
+      } else {
+        alertEl.className = 'alert alert-success';
+        alertEl.textContent = 'Cảm ơn bạn! Đánh giá đã được ghi nhận thành công.';
+        alertEl.style.display = 'block';
+        document.getElementById('btnSubmitFeedback').disabled = true;
+        document.getElementById('avgScore').textContent = data.averageRating;
+        document.getElementById('totalReviews').textContent = data.totalFeedbacks;
+      }
+    }
+  </script>
+</body>
+</html>

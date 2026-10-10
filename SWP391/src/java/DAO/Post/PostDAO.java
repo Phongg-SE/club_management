@@ -4,35 +4,22 @@
  */
 package DAO.Post;
 
-import com.oracle.wls.shaded.org.apache.bcel.generic.AALOAD;
 import model.dto.DBContext;
 import model.entity.Post;
+import model.entity.Club;
+import model.entity.Setting;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.sql.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import model.entity.Club;
-import model.entity.Setting;
-import service.post.PostService;
 
-/**
- *
- * @author nam
- */
 public class PostDAO {
 
-    private Connection conn;
-
     public PostDAO() {
-        try {
-            this.conn = DBContext.getJDBCConnection();
-        } catch (Exception e) {
-            Logger.getLogger(PostDAO.class.getName()).log(Level.SEVERE, null, e);
-        }
     }
 
     public List<Post> getPostsByUserId(int userId) {
@@ -71,30 +58,6 @@ public class PostDAO {
         return posts;
     }
 
-//    public static void main(String[] args) {
-//        PostDAO postDAO = new PostDAO(); // Giả sử PostDAO là class chứa phương thức getPostsByUserId
-//        int testUserId = 52; // Thay đổi ID này để kiểm tra với dữ liệu thật trong DB
-//        
-//        List<Post> posts = postDAO.getPostsByUserId(testUserId);
-//        
-//        if (posts.isEmpty()) {
-//            System.out.println("Không có bài viết nào cho userId = " + testUserId);
-//        } else {
-//            for (Post post : posts) {
-//                System.out.println("Post ID: " + post.getPostId());
-//                System.out.println("User ID: " + post.getUserId());
-//                System.out.println("Club ID: " + post.getClubId());
-//                System.out.println("Image URL: " + post.getImageUrl());
-//                System.out.println("Title: " + post.getTitle());
-//                System.out.println("Status: " + post.getStatus());
-//                System.out.println("Description: " + post.getDescription());
-//                System.out.println("Post At: " + post.getPostedAt());
-//                System.out.println("Author: " + post.getAuthor());
-//                System.out.println("Club Name: " + post.getClubName());
-//                System.out.println("-----------------------------------");
-//            }
-//        }
-//    }
     public Post getPostById(int postId) {
         Post post = null;
         String query = """
@@ -361,37 +324,5 @@ public class PostDAO {
     }
     return 0;
 }
-
-
-    public static void main(String[] args) {
-         
-       
-    }
 }
-    
-
-
-//    public static void main(String[] args) {
-//        PostDAO postDAO = new PostDAO(); // Giả sử PostDAO là lớp chứa phương thức updatePost()
-//
-//        // Tạo một đối tượng Post với dữ liệu cập nhật
-//        Post postToUpdate = new Post();
-//        postToUpdate.setPostId(1); // Đặt ID của bài viết cần cập nhật
-//        postToUpdate.setTitle("Cập nhật tiêu đề mới");
-//        postToUpdate.setImageUrl("https://example.com/new-image.jpg");
-//        postToUpdate.setDescription("Mô tả bài viết đã được cập nhật.");
-//        postToUpdate.setStatus("Published");
-//        postToUpdate.setClubId(2); // ID của câu lạc bộ liên quan
-//        postToUpdate.setClubName("Câu lạc bộ công nghệ");
-//
-//        // Gọi phương thức cập nhật
-//        boolean isUpdated = postDAO.updatePost(postToUpdate);
-//
-//        // Kiểm tra kết quả
-//        if (isUpdated) {
-//            System.out.println("Cập nhật bài viết thành công!");
-//        } else {
-//            System.out.println("Cập nhật bài viết thất bại.");
-//        }
-//    }
 

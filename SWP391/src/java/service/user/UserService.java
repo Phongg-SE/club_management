@@ -163,14 +163,29 @@ public class UserService {
         if (!password.equals(repassword)) {
             return "Password doesn't match!";
         }
-        if (password.length() < 8) {
-            return "Password must be greater than 8";
+        if (!isStrongPassword(password)) {
+            return "Mật khẩu phải có tối thiểu 8 ký tự, bao gồm ít nhất 1 chữ in hoa, 1 chữ số và 1 ký tự đặc biệt!";
         }
         if (checkEmailExist(email) || checkUsernameExist(email)) {
             return "Email or Username already exists!";
         }
 
         return null;
+    }
+
+    public static boolean isStrongPassword(String password) {
+        if (password == null || password.length() < 8) {
+            return false;
+        }
+        boolean hasUpper = false;
+        boolean hasDigit = false;
+        boolean hasSpecial = false;
+        for (char c : password.toCharArray()) {
+            if (Character.isUpperCase(c)) hasUpper = true;
+            else if (Character.isDigit(c)) hasDigit = true;
+            else if (!Character.isLetterOrDigit(c)) hasSpecial = true;
+        }
+        return hasUpper && hasDigit && hasSpecial;
     }
 
     public List<User> getAllUsers() {

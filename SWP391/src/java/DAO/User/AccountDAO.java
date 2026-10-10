@@ -27,8 +27,6 @@ import java.util.logging.Logger;
  * @author nam
  */
 public class AccountDAO {
-     private Connection conn;
-      
 
     public List<User> getAllAccounts() {
         List<User> accounts = new ArrayList<>();
@@ -379,18 +377,7 @@ public boolean isPhoneNumberExists(String phoneNumber, int userId) {
     }
     return false;
 }
-
-
-
-   public static void main(String[] args) {
-        AccountDAO dao = new AccountDAO();
-
-        // Kiểm tra email tồn tại
-    
-    }
-        
-       
-    }
+}
        
     
    

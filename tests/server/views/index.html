@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Club Management - Trung Tâm Tính Năng Cải Thiện</title>
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --success: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+    }
+    [data-theme="dark"] {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #334155;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    body { background: var(--bg); color: var(--text); transition: background 0.2s, color 0.2s; min-height: 100vh; }
+    .header { background: var(--card-bg); border-bottom: 1px solid var(--border); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+    .brand { font-size: 1.25rem; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 0.5rem; }
+    .nav-actions { display: flex; align-items: center; gap: 1rem; }
+    .btn { padding: 0.5rem 1rem; border-radius: 0.375rem; border: none; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-theme { background: transparent; border: 1px solid var(--border); color: var(--text); }
+    .container { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; }
+    .hero { text-align: center; margin-bottom: 2.5rem; }
+    .hero h1 { font-size: 2.25rem; margin-bottom: 0.75rem; }
+    .hero p { color: var(--text-muted); font-size: 1.1rem; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; }
+    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 0.75rem; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.2s, box-shadow 0.2s; }
+    .card:hover { transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+    .card-badge { display: inline-block; font-size: 0.75rem; font-weight: 600; padding: 0.25rem 0.5rem; border-radius: 9999px; background: #e0e7ff; color: #3730a3; margin-bottom: 0.75rem; }
+    .card h3 { font-size: 1.25rem; margin-bottom: 0.5rem; }
+    .card p { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.25rem; flex-grow: 1; }
+    .card-footer { display: flex; justify-content: space-between; align-items: center; }
+    .test-badge { font-size: 0.8rem; color: var(--success); font-weight: 600; display: flex; align-items: center; gap: 0.25rem; }
+    #toast { position: fixed; bottom: 2rem; right: 2rem; background: #1e293b; color: white; padding: 0.75rem 1.25rem; border-radius: 0.5rem; display: none; z-index: 1000; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.2); }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="brand">
+      <span>🏛️</span> SWP391 Club Management
+    </div>
+    <div class="nav-actions">
+      <button id="themeToggleBtn" class="btn btn-theme" onclick="toggleTheme()">🌙 Chế độ tối</button>
+      <a href="/notification" class="btn btn-primary" id="headerNotifyBtn">🔔 Thông báo</a>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="hero">
+      <h1>Hệ Thống Kiểm Thử Các Tính Năng Cải Thiện</h1>
+      <p>Kiểm tra trực tiếp các module nghiệp vụ nâng cấp bằng Playwright End-to-End Suite</p>
+    </div>
+
+    <div class="grid">
+      <div class="card" id="card-notification">
+        <div>
+          <span class="card-badge">Module 1 - Priority High</span>
+          <h3>🔔 In-App Notification Center</h3>
+          <p>Hệ thống chuông thông báo, badge đếm chưa đọc, lọc theo phân loại và đánh dấu đã đọc tức thì.</p>
+        </div>
+        <div class="card-footer">
+          <span class="test-badge">✓ Sẵn sàng kiểm thử</span>
+          <a href="/notification" class="btn btn-primary" id="btn-goto-notification">Xem module</a>
+        </div>
+      </div>
+
+      <div class="card" id="card-dashboard">
+        <div>
+          <span class="card-badge">Module 2 - Priority High</span>
+          <h3>📊 Club Leader Analytics</h3>
+          <p>Thống kê KPI toàn diện: Tiến độ Task, phân bổ ban ngành, số dư quỹ và tỷ lệ tham gia sự kiện.</p>
+        </div>
+        <div class="card-footer">
+          <span class="test-badge">✓ Sẵn sàng kiểm thử</span>
+          <a href="/dashboard" class="btn btn-primary" id="btn-goto-dashboard">Xem module</a>
+        </div>
+      </div>
+
+      <div class="card" id="card-comments">
+        <div>
+          <span class="card-badge">Module 3 - Priority High</span>
+          <h3>💬 Post & Event Discussion</h3>
+          <p>Hệ thống bình luận tương tác, phản hồi đa cấp (reply), kiểm duyệt nội dung và ngăn chặn XSS.</p>
+        </div>
+        <div class="card-footer">
+          <span class="test-badge">✓ Sẵn sàng kiểm thử</span>
+          <a href="/comments" class="btn btn-primary" id="btn-goto-comments">Xem module</a>
+        </div>
+      </div>
+
+      <div class="card" id="card-calendar">
+        <div>
+          <span class="card-badge">Module 4 - Priority High</span>
+          <h3>📅 Calendar & Timeline View</h3>
+          <p>Lịch hoạt động tháng/tuần trực quan, theo dõi deadline sự kiện và task của CLB.</p>
+        </div>
+        <div class="card-footer">
+          <span class="test-badge">✓ Sẵn sàng kiểm thử</span>
+          <a href="/calendar" class="btn btn-primary" id="btn-goto-calendar">Xem module</a>
+        </div>
+      </div>
+
+      <div class="card" id="card-feedback">
+        <div>
+          <span class="card-badge">Module 5 - Priority Medium</span>
+          <h3>⭐ Event Feedback & Rating</h3>
+          <p>Khảo sát đánh giá 1-5 sao sau sự kiện, quy tắc kiểm tra 1 đánh giá/user và điểm trung bình.</p>
+        </div>
+        <div class="card-footer">
+          <span class="test-badge">✓ Sẵn sàng kiểm thử</span>
+          <a href="/feedback" class="btn btn-primary" id="btn-goto-feedback">Xem module</a>
+        </div>
+      </div>
+
+      <div class="card" id="card-bulk-email">
+        <div>
+          <span class="card-badge">Module 6 - Priority Medium</span>
+          <h3>📧 Bulk Email Notification</h3>
+          <p>Gửi email hàng loạt tới thành viên CLB qua mẫu template có sẵn và xác thực nội dung.</p>
+        </div>
+        <div class="card-footer">
+          <span class="test-badge">✓ Sẵn sàng kiểm thử</span>
+          <a href="/bulk-email" class="btn btn-primary" id="btn-goto-bulk-email">Xem module</a>
+        </div>
+      </div>
+
+      <div class="card" id="card-search-filter">
+        <div>
+          <span class="card-badge">Module 7 - Priority Low</span>
+          <h3>🔍 Advanced Search & Filter</h3>
+          <p>Tìm kiếm và lọc đa tiêu chí tức thì (Debounced instant search) theo danh mục, trạng thái.</p>
+        </div>
+        <div class="card-footer">
+          <span class="test-badge">✓ Sẵn sàng kiểm thử</span>
+          <a href="/search-filter" class="btn btn-primary" id="btn-goto-search-filter">Xem module</a>
+        </div>
+      </div>
+
+      <div class="card" id="card-export-reports">
+        <div>
+          <span class="card-badge">Module 8 - Priority Low</span>
+          <h3>📈 Export Data & Reports</h3>
+          <p>Xuất báo cáo danh sách thành viên và báo cáo thu chi quỹ ra định dạng CSV chuẩn.</p>
+        </div>
+        <div class="card-footer">
+          <span class="test-badge">✓ Sẵn sàng kiểm thử</span>
+          <a href="/export-reports" class="btn btn-primary" id="btn-goto-export-reports">Xem module</a>
+        </div>
+      </div>
+
+      <div class="card" id="card-security">
+        <div>
+          <span class="card-badge">Module 9 - Security</span>
+          <h3>🔐 Security Hardening</h3>
+          <p>Kiểm tra CSRF token, phòng chống tấn công XSS và chính sách độ mạnh mật khẩu.</p>
+        </div>
+        <div class="card-footer">
+          <span class="test-badge">✓ Sẵn sàng kiểm thử</span>
+          <a href="/security" class="btn btn-primary" id="btn-goto-security">Xem module</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="toast"></div>
+
+  <script>
+    function toggleTheme() {
+      const isDark = document.body.getAttribute('data-theme') === 'dark';
+      document.body.setAttribute('data-theme', isDark ? 'light' : 'dark');
+      document.getElementById('themeToggleBtn').textContent = isDark ? '🌙 Chế độ tối' : '☀️ Chế độ sáng';
+      showToast(isDark ? 'Đã chuyển sang chế độ sáng' : 'Đã chuyển sang chế độ tối');
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.style.display = 'block';
+      setTimeout(() => { toast.style.display = 'none'; }, 3000);
+    }
+  </script>
+</body>
+</html>

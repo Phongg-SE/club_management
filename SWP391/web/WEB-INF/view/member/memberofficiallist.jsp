@@ -142,6 +142,9 @@
                                                     </option>
                                                 </c:forEach>
                                             </select>
+                                            <a href="ExportMemberCSV?club_id=${selectedClubId}" class="btn btn-success btn-sm ms-2" title="Xuất danh sách thành viên ra CSV">
+                                                📥 Xuất CSV
+                                            </a>
                                         </form>
 
                                         <ul class="nav nav-tabs" id="memberTabs">
@@ -622,6 +625,23 @@
                     confirmMessage.textContent = message;
                     confirmAction.setAttribute("href", actionUrl);
                 });
+            });
+        </script>
+
+        <!-- Client-side Instant Multi-criteria Filter -->
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const searchInput = document.getElementById("searchInput");
+                if (searchInput) {
+                    searchInput.addEventListener("input", function (e) {
+                        const term = e.target.value.toLowerCase().trim();
+                        const rows = document.querySelectorAll("table.display tbody tr");
+                        rows.forEach(function (row) {
+                            const text = row.innerText.toLowerCase();
+                            row.style.display = text.includes(term) ? "" : "none";
+                        });
+                    });
+                }
             });
         </script>
     </body>

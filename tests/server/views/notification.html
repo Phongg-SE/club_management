@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notification Center - Club Management</title>
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #0f172a;
+      --border: #e2e8f0;
+      --unread-bg: #eef2ff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+    body { background: var(--bg); color: var(--text); padding: 2rem; }
+    .container { max-width: 800px; margin: 0 auto; background: var(--card-bg); border-radius: 0.75rem; border: 1px solid var(--border); padding: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+    .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+    .title-area { display: flex; align-items: center; gap: 0.75rem; }
+    .badge { background: #ef4444; color: white; border-radius: 9999px; padding: 0.2rem 0.6rem; font-size: 0.85rem; font-weight: 700; }
+    .btn { padding: 0.5rem 1rem; border-radius: 0.375rem; border: 1px solid var(--border); cursor: pointer; font-weight: 500; background: white; }
+    .btn-primary { background: var(--primary); color: white; border: none; }
+    .btn-link { background: none; border: none; color: var(--primary); cursor: pointer; text-decoration: underline; }
+    .filters { display: flex; gap: 0.5rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; }
+    .filter-btn { padding: 0.35rem 0.75rem; border-radius: 0.25rem; border: none; background: transparent; cursor: pointer; font-weight: 600; color: #64748b; }
+    .filter-btn.active { background: #e0e7ff; color: var(--primary); }
+    .notify-list { display: flex; flex-direction: column; gap: 0.75rem; }
+    .notify-item { padding: 1rem; border-radius: 0.5rem; border: 1px solid var(--border); display: flex; gap: 1rem; align-items: flex-start; transition: background 0.2s; }
+    .notify-item.unread { background: var(--unread-bg); border-color: #c7d2fe; }
+    .notify-icon { font-size: 1.5rem; }
+    .notify-content { flex-grow: 1; }
+    .notify-content h4 { font-size: 1rem; margin-bottom: 0.25rem; }
+    .notify-content p { font-size: 0.9rem; color: #475569; margin-bottom: 0.35rem; }
+    .notify-time { font-size: 0.75rem; color: #94a3b8; }
+    .empty-state { text-align: center; padding: 2rem; color: #94a3b8; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="top-bar">
+      <div class="title-area">
+        <a href="/" class="btn-link">← Quay lại</a>
+        <h2>🔔 Trung Tâm Thông Báo</h2>
+        <span id="unreadBadge" class="badge">3</span>
+      </div>
+      <div>
+        <button id="markAllReadBtn" class="btn" onclick="markAllRead()">✓ Đánh dấu tất cả đã đọc</button>
+      </div>
+    </div>
+
+    <div class="filters">
+      <button class="filter-btn active" onclick="setFilter('ALL', this)" id="filter-all">Tất cả</button>
+      <button class="filter-btn" onclick="setFilter('TASK', this)" id="filter-task">Công việc (Task)</button>
+      <button class="filter-btn" onclick="setFilter('EVENT', this)" id="filter-event">Sự kiện</button>
+      <button class="filter-btn" onclick="setFilter('FINANCE', this)" id="filter-finance">Tài chính</button>
+    </div>
+
+    <div id="notifyList" class="notify-list">
+      <!-- Items populated by JS -->
+    </div>
+  </div>
+
+  <script>
+    let notifications = [];
+    let currentFilter = 'ALL';
+
+    const icons = {
+      TASK: '📋',
+      EVENT: '🎉',
+      FINANCE: '💰',
+      MEMBER: '👤',
+      SYSTEM: '⚙️'
+    };
+
+    async function loadNotifications() {
+      const res = await fetch('/api/notifications');
+      notifications = await res.json();
+      render();
+    }
+
+    function render() {
+      const listEl = document.getElementById('notifyList');
+      const filtered = notifications.filter(n => currentFilter === 'ALL' || n.type === currentFilter);
+      const unreadCount = notifications.filter(n => !n.is_read).length;
+      
+      const badge = document.getElementById('unreadBadge');
+      badge.textContent = unreadCount;
+      badge.style.display = unreadCount > 0 ? 'inline-block' : 'none';
+
+      if (filtered.length === 0) {
+        listEl.innerHTML = '<div class="empty-state">Không có thông báo nào trong mục này.</div>';
+        return;
+      }
+
+      listEl.innerHTML = filtered.map(n => `
+        <div class="notify-item ${n.is_read ? 'read' : 'unread'}" data-id="${n.id}" data-type="${n.type}">
+          <div class="notify-icon">${icons[n.type] || '🔔'}</div>
+          <div class="notify-content">
+            <h4>${n.title}</h4>
+            <p>${n.message}</p>
+            <div class="notify-time">${n.created_at}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function setFilter(type, btn) {
+      currentFilter = type;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      render();
+    }
+
+    async function markAllRead() {
+      const res = await fetch('/api/notifications/mark-all-read', { method: 'POST' });
+      if (res.ok) {
+        notifications = notifications.map(n => ({ ...n, is_read: true }));
+        render();
+      }
+    }
+
+    window.onload = loadNotifications;
+  </script>
+</body>
+</html>

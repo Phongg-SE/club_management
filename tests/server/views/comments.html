@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Post Discussion & Comments - SWP391</title>
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #0f172a;
+      --border: #e2e8f0;
+      --danger: #ef4444;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+    body { background: var(--bg); color: var(--text); padding: 2rem; }
+    .container { max-width: 800px; margin: 0 auto; }
+    .post-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 0.75rem; padding: 1.5rem; margin-bottom: 2rem; }
+    .post-header { margin-bottom: 1rem; }
+    .post-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 0.25rem; }
+    .post-meta { font-size: 0.85rem; color: #64748b; }
+    .post-body { font-size: 1rem; line-height: 1.6; color: #334155; }
+    .comments-section { background: var(--card-bg); border: 1px solid var(--border); border-radius: 0.75rem; padding: 1.5rem; }
+    .comment-form { margin-bottom: 2rem; }
+    .comment-input { width: 100%; border: 1px solid var(--border); border-radius: 0.5rem; padding: 0.75rem; font-size: 0.95rem; min-height: 90px; resize: vertical; }
+    .form-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem; }
+    .error-msg { color: var(--danger); font-size: 0.85rem; display: none; }
+    .btn { padding: 0.5rem 1rem; border-radius: 0.375rem; border: none; font-weight: 600; cursor: pointer; }
+    .btn-primary { background: var(--primary); color: white; }
+    .comment-item { border-bottom: 1px solid var(--border); padding: 1rem 0; }
+    .comment-item:last-child { border-bottom: none; }
+    .comment-header { display: flex; justify-content: space-between; margin-bottom: 0.35rem; }
+    .comment-author { font-weight: 600; font-size: 0.95rem; }
+    .comment-time { font-size: 0.8rem; color: #94a3b8; }
+    .comment-content { font-size: 0.95rem; color: #334155; line-height: 1.5; }
+    .comment-reply { margin-left: 2rem; border-left: 2px solid #e0e7ff; padding-left: 1rem; margin-top: 0.75rem; background: #fafafa; border-radius: 0 0.375rem 0.375rem 0; padding-top: 0.5rem; padding-bottom: 0.5rem; }
+    .reply-btn { background: none; border: none; color: var(--primary); font-size: 0.8rem; cursor: pointer; margin-top: 0.5rem; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="/" style="color: var(--primary); text-decoration: none;">← Quay lại</a>
+    
+    <div class="post-card" style="margin-top: 1rem;">
+      <div class="post-header">
+        <h1 class="post-title" id="postTitle">Thông Báo Kế Hoạch Chào Đón Tân Sinh Viên K20</h1>
+        <div class="post-meta">Đăng bởi: <strong>Ban Chủ Nhiệm CLB</strong> • Ngày 09/10/2026</div>
+      </div>
+      <div class="post-body">
+        Chào toàn thể thành viên CLB! Ban Chủ Nhiệm xin gửi tới các bạn kế hoạch chi tiết cho chuỗi sự kiện chào đón K20 sắp tới. Mọi người vui lòng đóng góp ý kiến và thảo luận bên dưới nhé.
+      </div>
+    </div>
+
+    <div class="comments-section">
+      <h3 style="margin-bottom: 1.25rem;">💬 Thảo Luận & Bình Luận (<span id="commentCount">2</span>)</h3>
+
+      <div class="comment-form">
+        <textarea id="commentInput" class="comment-input" placeholder="Viết bình luận hoặc câu hỏi của bạn tại đây..."></textarea>
+        <div class="form-footer">
+          <span id="commentError" class="error-msg">Vui lòng nhập nội dung bình luận!</span>
+          <button id="submitCommentBtn" class="btn btn-primary" onclick="submitComment()">Gửi bình luận</button>
+        </div>
+      </div>
+
+      <div id="commentsList">
+        <!-- Rendered via JS -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let comments = [];
+
+    async function loadComments() {
+      const res = await fetch('/api/comments');
+      comments = await res.json();
+      renderComments();
+    }
+
+    function renderComments() {
+      const list = document.getElementById('commentsList');
+      const countEl = document.getElementById('commentCount');
+      countEl.textContent = comments.length;
+
+      const topLevel = comments.filter(c => !c.parent_id);
+      
+      list.innerHTML = topLevel.map(c => {
+        const replies = comments.filter(r => r.parent_id === c.id);
+        return `
+          <div class="comment-item" data-id="${c.id}">
+            <div class="comment-header">
+              <span class="comment-author">${c.author}</span>
+              <span class="comment-time">${c.created_at}</span>
+            </div>
+            <div class="comment-content">${c.content}</div>
+            <button class="reply-btn" onclick="replyTo(${c.id}, '${c.author}')">↪ Trả lời</button>
+
+            ${replies.map(r => `
+              <div class="comment-reply" data-id="${r.id}">
+                <div class="comment-header">
+                  <span class="comment-author">${r.author}</span>
+                  <span class="comment-time">${r.created_at}</span>
+                </div>
+                <div class="comment-content">${r.content}</div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function submitComment() {
+      const input = document.getElementById('commentInput');
+      const errorEl = document.getElementById('commentError');
+      const val = input.value.trim();
+
+      if (!val) {
+        errorEl.style.display = 'inline';
+        return;
+      }
+      errorEl.style.display = 'none';
+
+      const res = await fetch('/api/comments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: val, author: 'Nguyễn Sinh Viên (Bạn)' })
+      });
+
+      if (res.ok) {
+        input.value = '';
+        await loadComments();
+      }
+    }
+
+    function replyTo(parentId, author) {
+      const input = document.getElementById('commentInput');
+      input.value = `@${author} `;
+      input.focus();
+    }
+
+    window.onload = loadComments;
+  </script>
+</body>
+</html>

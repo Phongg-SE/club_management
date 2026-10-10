@@ -3,3 +3,8 @@
 */build/
 */nbproject/private/
 ~*
+node_modules/
+playwright-report/
+test-results/
+.playwright/
+take-screenshots.js

@@ -7,6 +7,7 @@ package controller.post;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -46,6 +47,8 @@ public class PostDetail extends HttpServlet {
 
             if (post != null) {
                 request.setAttribute("post", post);
+                List<model.entity.Comment> comments = new service.comment.CommentService().getCommentsByPostId(postId);
+                request.setAttribute("comments", comments);
                 request.getRequestDispatcher("/WEB-INF/view/post/PostDetail.jsp").forward(request, response);
             }
         } catch (NumberFormatException e) {

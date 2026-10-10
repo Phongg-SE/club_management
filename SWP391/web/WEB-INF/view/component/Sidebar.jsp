@@ -91,6 +91,9 @@
                         </a>
                         <div class="collapse" id="club">
                             <ul class="nav nav-collapse">
+                                <li><a href="club-dashboard"><span class="sub-item">Analytics Dashboard</span></a></li>
+                                <li><a href="club-calendar"><span class="sub-item">Lịch & Timeline</span></a></li>
+                                <li><a href="bulk-email"><span class="sub-item">Gửi Email CLB</span></a></li>
                                 <li><a href="memberofficiallist"><span class="sub-item">Club Member</span></a></li>
                                 <li><a href="FinanceList"><span class="sub-item">Finances</span></a></li>
                                 <li><a href="taskList"><span class="sub-item">Task</span></a></li>
@@ -116,6 +119,12 @@
                         </div>
                     </li>     
                 </c:if>
+                <li class="nav-item">
+                    <a href="Notification">
+                        <i class="fas fa-bell"></i>
+                        <p>Thông Báo</p>
+                    </a>
+                </li>
                 <li class="nav-item">
                     <a href="logout">
                         <i class="fas fa-sign-out-alt"></i>

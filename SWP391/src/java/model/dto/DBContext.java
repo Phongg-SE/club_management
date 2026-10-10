@@ -30,13 +30,4 @@ public class DBContext {
         return null;
     }
 
-    public static void main(String[] args) {
-        Connection con = getJDBCConnection();
-
-        if (con != null) {
-            System.out.println("thanh cong");
-        } else {
-            System.out.println("that bai");
-        }
-    }
 }

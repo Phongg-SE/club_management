@@ -40,14 +40,25 @@ public class EventDetail extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        int eventID = Integer.parseInt(request.getParameter("eventID"));
+        String idParam = request.getParameter("eventID");
+        if (idParam == null) {
+            idParam = request.getParameter("event_id");
+        }
+        int eventID = Integer.parseInt(idParam);
         Event event = eventService.getEventById(eventID);
-        int clubId = event.getClub_id(); // Lấy clubId từ Finance
+        int clubId = event.getClub_id();
         List<User> users = projectService.getAllEventLeaderByClubID(clubId);
         request.setAttribute("users", users);
         request.setAttribute("event", event);
-        request.getRequestDispatcher("/WEB-INF/view/event/eventdetail.jsp").forward(request, response);
 
+        // Load Event Feedback & Comments
+        service.event.FeedbackService feedbackService = new service.event.FeedbackService();
+        service.comment.CommentService commentService = new service.comment.CommentService();
+        request.setAttribute("feedbacks", feedbackService.getEventFeedbacks(eventID));
+        request.setAttribute("avgRating", feedbackService.getAverageRating(eventID));
+        request.setAttribute("comments", commentService.getCommentsByEventId(eventID));
+
+        request.getRequestDispatcher("/WEB-INF/view/event/eventdetail.jsp").forward(request, response);
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

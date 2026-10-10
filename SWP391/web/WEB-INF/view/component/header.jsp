@@ -67,6 +67,26 @@
             padding: 15px;
             height: 100%;
         }
+
+        /* Dark Theme Styles */
+        body.dark-theme {
+            background-color: #121212 !important;
+            color: #e0e0e0 !important;
+        }
+        body.dark-theme .sticky-header, 
+        body.dark-theme .menu-bar, 
+        body.dark-theme .card, 
+        body.dark-theme .cours-bx {
+            background-color: #1e1e1e !important;
+            color: #ffffff !important;
+            border-color: #333 !important;
+        }
+        body.dark-theme .sub-menu {
+            background-color: #242424 !important;
+        }
+        body.dark-theme .sub-menu li a {
+            color: #e0e0e0 !important;
+        }
     </style>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -256,7 +276,24 @@
                         </c:if>
 
                         <c:if test="${not empty sessionScope.account}">
-                            <ul class="nav navbar-nav ml-auto" style="margin-left: auto;">
+                            <ul class="nav navbar-nav ml-auto" style="margin-left: auto; display: flex; align-items: center;">
+                                <li>
+                                    <a href="club-calendar" title="Lịch hoạt động"><i class="fa fa-calendar"></i> Lịch</a>
+                                </li>
+                                <li>
+                                    <a href="club-dashboard" title="Dashboard CLB"><i class="fa fa-chart-line"></i> Dashboard</a>
+                                </li>
+                                <li>
+                                    <a href="Notification" title="Thông báo" style="position: relative;">
+                                        <i class="fa fa-bell"></i>
+                                        <span class="badge badge-danger" style="background:#dc3545; color:#fff; border-radius:50%; font-size:10px; padding:2px 5px; position:relative; top:-8px; left:-5px;">3</span>
+                                    </a>
+                                </li>
+                                <li style="margin-right: 15px;">
+                                    <button type="button" id="darkModeToggle" class="btn btn-sm btn-outline-secondary" style="border-radius:20px; font-size:12px; padding:4px 10px;" onclick="toggleDarkMode()">
+                                        <i class="fa fa-moon" id="darkIcon"></i>
+                                    </button>
+                                </li>
                                 <li class="nav-dashboard">
                                     <a href="javascript:;" style="display: flex; align-items: center;">
                                         <img src="${sessionScope.account.avatar_url}" 
@@ -286,4 +323,21 @@
             </div>
         </div>
     </header>
+
+    <script>
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-theme');
+            const isDark = document.body.classList.contains('dark-theme');
+            localStorage.setItem('swp391_theme', isDark ? 'dark' : 'light');
+            const icon = document.getElementById('darkIcon');
+            if (icon) {
+                icon.className = isDark ? 'fa fa-sun' : 'fa fa-moon';
+            }
+        }
+        (function() {
+            if (localStorage.getItem('swp391_theme') === 'dark') {
+                document.body.classList.add('dark-theme');
+            }
+        })();
+    </script>
 </body>

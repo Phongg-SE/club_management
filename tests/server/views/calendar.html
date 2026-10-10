@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calendar & Schedule View - SWP391</title>
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #0f172a;
+      --border: #e2e8f0;
+      --event-bg: #e0e7ff;
+      --event-text: #3730a3;
+      --task-bg: #fef3c7;
+      --task-text: #92400e;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+    body { background: var(--bg); color: var(--text); padding: 2rem; }
+    .container { max-width: 1000px; margin: 0 auto; background: var(--card-bg); border: 1px solid var(--border); border-radius: 0.75rem; padding: 1.5rem; }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+    .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 0.5rem; overflow: hidden; }
+    .day-header { background: #f1f5f9; padding: 0.75rem; text-align: center; font-weight: 600; font-size: 0.85rem; color: #475569; }
+    .day-cell { background: white; min-height: 100px; padding: 0.5rem; position: relative; }
+    .day-num { font-size: 0.85rem; font-weight: 600; color: #64748b; margin-bottom: 0.5rem; }
+    .day-item { font-size: 0.75rem; padding: 0.2rem 0.4rem; border-radius: 0.25rem; margin-bottom: 0.25rem; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .item-event { background: var(--event-bg); color: var(--event-text); font-weight: 500; }
+    .item-task { background: var(--task-bg); color: var(--task-text); font-weight: 500; }
+    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); justify-content: center; align-items: center; }
+    .modal-content { background: white; padding: 1.5rem; border-radius: 0.5rem; max-width: 450px; width: 90%; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div>
+        <a href="/" style="color: var(--primary); text-decoration: none;">← Quay lại</a>
+        <h2 style="margin-top: 0.5rem;">📅 Lịch Hoạt Động & Deadline (Tháng 10/2026)</h2>
+      </div>
+      <div>
+        <select id="filterClub" style="padding: 0.4rem 0.8rem; border-radius: 0.375rem; border: 1px solid var(--border);">
+          <option value="ALL">Tất cả CLB</option>
+          <option value="IT">CLB Tin Học</option>
+          <option value="MUSIC">CLB Âm Nhạc</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="calendar-grid">
+      <div class="day-header">Thứ Hai</div>
+      <div class="day-header">Thứ Ba</div>
+      <div class="day-header">Thứ Tư</div>
+      <div class="day-header">Thứ Năm</div>
+      <div class="day-header">Thứ Sáu</div>
+      <div class="day-header">Thứ Bảy</div>
+      <div class="day-header">Chủ Nhật</div>
+
+      <!-- Sample days 5 through 11 of Oct 2026 -->
+      <div class="day-cell" data-date="2026-10-05">
+        <div class="day-num">5</div>
+      </div>
+      <div class="day-cell" data-date="2026-10-06">
+        <div class="day-num">6</div>
+        <div class="day-item item-task" onclick="showModal('Task: Nộp báo cáo tài chính', 'Deadline báo cáo tài chính tháng 9', 'Hạn: 17:00 ngày 06/10')">⏰ Deadline Báo Cáo</div>
+      </div>
+      <div class="day-cell" data-date="2026-10-07">
+        <div class="day-num">7</div>
+      </div>
+      <div class="day-cell" data-date="2026-10-08">
+        <div class="day-num">8</div>
+        <div class="day-item item-event" onclick="showModal('Sự kiện: Workshop Lập Trình Java', 'Hội trường Delta, FPTU', '14:00 - 17:00')">🎉 Workshop Java</div>
+      </div>
+      <div class="day-cell" data-date="2026-10-09">
+        <div class="day-num">9</div>
+      </div>
+      <div class="day-cell" data-date="2026-10-10">
+        <div class="day-num">10 (Hôm nay)</div>
+        <div class="day-item item-task" id="item-today-task" onclick="showModal('Task: Hoàn thiện kịch bản Gala', 'Ban Chuyên Môn phụ trách', 'Hạn: 23:59 hôm nay')">⏰ Nộp kịch bản Gala</div>
+      </div>
+      <div class="day-cell" data-date="2026-10-11">
+        <div class="day-num">11</div>
+        <div class="day-item item-event" id="item-gala-event" onclick="showModal('Sự kiện: Gala Chào Tân Sinh Viên', 'Hội trường lớn Alpha', '18:00 - 21:30')">🎉 Gala Tân Sinh Viên</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="detailModal" class="modal">
+    <div class="modal-content">
+      <h3 id="modalTitle" style="margin-bottom: 0.5rem;">Chi tiết</h3>
+      <p id="modalDesc" style="color: #475569; margin-bottom: 0.5rem;"></p>
+      <p id="modalMeta" style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 1rem;"></p>
+      <button class="btn" style="background: var(--primary); color: white; border: none; padding: 0.4rem 0.8rem; border-radius: 0.25rem; cursor: pointer;" onclick="closeModal()">Đóng</button>
+    </div>
+  </div>
+
+  <script>
+    function showModal(title, desc, meta) {
+      document.getElementById('modalTitle').textContent = title;
+      document.getElementById('modalDesc').textContent = desc;
+      document.getElementById('modalMeta').textContent = meta;
+      document.getElementById('detailModal').style.display = 'flex';
+    }
+    function closeModal() {
+      document.getElementById('detailModal').style.display = 'none';
+    }
+  </script>
+</body>
+</html>

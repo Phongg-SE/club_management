@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Club Analytics Dashboard - SWP391</title>
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #0f172a;
+      --border: #e2e8f0;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: sans-serif; }
+    body { background: var(--bg); color: var(--text); padding: 2rem; }
+    .container { max-width: 1100px; margin: 0 auto; }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.25rem; margin-bottom: 2rem; }
+    .kpi-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 0.75rem; padding: 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .kpi-card h4 { font-size: 0.85rem; color: #64748b; text-transform: uppercase; margin-bottom: 0.5rem; }
+    .kpi-value { font-size: 1.8rem; font-weight: 700; color: var(--primary); }
+    .kpi-trend { font-size: 0.8rem; color: var(--success); margin-top: 0.25rem; }
+    .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    @media (max-width: 768px) { .charts-grid { grid-template-columns: 1fr; } }
+    .chart-panel { background: var(--card-bg); border: 1px solid var(--border); border-radius: 0.75rem; padding: 1.5rem; }
+    .chart-panel h3 { font-size: 1.1rem; margin-bottom: 1.25rem; }
+    .progress-bar-container { margin-bottom: 1rem; }
+    .progress-labels { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.35rem; }
+    .progress-track { height: 10px; background: #e2e8f0; border-radius: 9999px; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 9999px; }
+    .fill-done { background: var(--success); width: 68%; }
+    .fill-inprogress { background: var(--warning); width: 22%; }
+    .fill-overdue { background: var(--danger); width: 10%; }
+    .finance-summary { display: flex; flex-direction: column; gap: 0.75rem; }
+    .finance-row { display: flex; justify-content: space-between; padding: 0.75rem; border-radius: 0.5rem; background: #f1f5f9; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div>
+        <a href="/" style="color: var(--primary); text-decoration: none;">← Trang chủ</a>
+        <h1 style="margin-top: 0.5rem;">📊 Bảng Điều Khiển Quản Lý CLB (Analytics Dashboard)</h1>
+      </div>
+      <div>
+        <span style="background: #e0e7ff; color: #3730a3; padding: 0.4rem 0.8rem; border-radius: 9999px; font-weight: 600; font-size: 0.85rem;">CLB Truyền Thông & Sự Kiện</span>
+      </div>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi-card" id="kpi-members">
+        <h4>Tổng Số Thành Viên</h4>
+        <div class="kpi-value" id="val-members">48</div>
+        <div class="kpi-trend">↑ +12% so với tháng trước</div>
+      </div>
+      <div class="kpi-card" id="kpi-tasks">
+        <h4>Task Đang Hoạt Động</h4>
+        <div class="kpi-value" id="val-tasks">25</div>
+        <div class="kpi-trend">17 hoàn thành, 6 đang làm, 2 trễ hạn</div>
+      </div>
+      <div class="kpi-card" id="kpi-events">
+        <h4>Sự Kiện Trong Học Kỳ</h4>
+        <div class="kpi-value" id="val-events">6</div>
+        <div class="kpi-trend">2 đã kết thúc, 4 sắp tới</div>
+      </div>
+      <div class="kpi-card" id="kpi-funds">
+        <h4>Số Dư Quỹ Hiện Tại</h4>
+        <div class="kpi-value" id="val-funds">14,250,000 ₫</div>
+        <div class="kpi-trend" style="color: var(--success);">Khả dụng chi tiêu</div>
+      </div>
+    </div>
+
+    <div class="charts-grid">
+      <div class="chart-panel" id="panel-tasks">
+        <h3>Tiến Độ Công Việc (Task Completion Rate)</h3>
+        
+        <div class="progress-bar-container">
+          <div class="progress-labels">
+            <span>Đã hoàn thành (Done)</span>
+            <span id="rate-done">68%</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill fill-done"></div>
+          </div>
+        </div>
+
+        <div class="progress-bar-container">
+          <div class="progress-labels">
+            <span>Đang thực hiện (In Progress)</span>
+            <span id="rate-inprogress">22%</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill fill-inprogress"></div>
+          </div>
+        </div>
+
+        <div class="progress-bar-container">
+          <div class="progress-labels">
+            <span>Quá hạn (Overdue)</span>
+            <span id="rate-overdue">10%</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill fill-overdue"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="chart-panel" id="panel-finance">
+        <h3>Tổng Quan Thu - Chi Tháng Này</h3>
+        <div class="finance-summary">
+          <div class="finance-row">
+            <span>Tổng thu (Quỹ thành viên, Tài trợ):</span>
+            <span id="sum-income" style="color: var(--success);">+ 22,000,000 ₫</span>
+          </div>
+          <div class="finance-row">
+            <span>Tổng chi (Sự kiện, Hoạt động CLB):</span>
+            <span id="sum-expense" style="color: var(--danger);">- 7,750,000 ₫</span>
+          </div>
+          <div class="finance-row" style="background: #e2e8f0;">
+            <span>Chênh lệch thặng dư:</span>
+            <span id="sum-surplus" style="color: var(--primary);">+ 14,250,000 ₫</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
